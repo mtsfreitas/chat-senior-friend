@@ -94,7 +94,7 @@ export default function Home() {
           <TextField
             fullWidth
             multiline
-            rows={rows}
+            //rows={rows}
             variant="outlined"
             placeholder="Paste your code here..."
             value={code}
@@ -104,7 +104,14 @@ export default function Home() {
               bgcolor: 'rgb(244, 244, 244)', 
               borderRadius: '8px', 
               '& .MuiOutlinedInput-root': {
-                borderRadius: '8px',
+                borderRadius: '15px',
+                padding: '25px',
+                fontSize: '16px',
+                resize: 'none',
+                outline: 'none',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box',
+                overflowY: 'auto',  // Permite rolagem para o texto sem alterar o padding
               }
             }}
           />
@@ -134,14 +141,14 @@ export default function Home() {
                 },
               }}
             >
-              {loading ? <CircularProgress size={24} /> : <img src="/send.svg" alt="Send" style={{ width: '20px', height: '20px' }} />}
+              {loading ? <CircularProgress size={24} /> : <img src="/wizard.svg" alt="Send" style={{ width: '20px', height: '20px' }} />}
             </Button>
           )}
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <img src="ai.svg" alt="AI Icon" style={{ width: '20px', height: '20px', marginRight: '8px' }} />
-          <Typography variant="body2" color="textSecondary">model: 'gpt-4o-mini'</Typography>
+          <Typography variant="body2" color="textSecondary">gpt-4o-mini</Typography>
         </Box>
 
         {error && (
