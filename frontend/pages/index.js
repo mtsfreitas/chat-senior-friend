@@ -4,7 +4,6 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import axios from 'axios';
 
-// Function to detect programming language
 const detectLanguage = (code) => {
   if (code.includes('import ') && code.includes('from ')) return 'javascript';
   if (code.includes('def ') || code.includes('class ')) return 'python';
@@ -16,7 +15,6 @@ const detectLanguage = (code) => {
   return 'plaintext';
 };
 
-// Function to format text with proper line breaks for numbered lists
 const formatText = (text) => {
   const lines = text.split('\n');
   return lines.map((line, index) => {
@@ -80,8 +78,8 @@ export default function Home() {
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            fontFamily: 'Consolas, monospace',  // Fonte Consolas
-            fontWeight: 'bold'  // Caso queira um peso de fonte mais forte
+            fontFamily: 'Consolas, monospace',  
+            fontWeight: 'bold'  
           }}
         >
           <img src="code-logo.svg" alt="Code Icon" style={{ width: '45px', height: '45px', marginRight: '15px' }} />
@@ -98,8 +96,8 @@ export default function Home() {
             onChange={handleCodeChange}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // Previne a ação padrão de adicionar uma nova linha
-                handleSubmit(); // Chama a função para enviar o código
+                e.preventDefault();
+                handleSubmit();
               }
             }}
             sx={{
@@ -114,13 +112,13 @@ export default function Home() {
                 outline: 'none',
                 fontFamily: 'inherit',
                 '& fieldset': {
-                  borderColor: '#848484', // Define a cor da borda para verde
+                  borderColor: '#848484',
                 },
                 '&:hover fieldset': {
-                  borderColor: '#848484', // Borda verde quando passa o mouse sobre o campo
+                  borderColor: '#848484', 
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: '#848484', // Borda verde quando o campo está em foco
+                  borderColor: '#848484',
                 },
               },
             }}

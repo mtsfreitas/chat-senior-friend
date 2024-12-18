@@ -3,7 +3,6 @@ const fastify = require('fastify')({ logger: true });
 const cors = require('@fastify/cors');
 const OpenAI = require('openai');
 
-// Configure CORS
 fastify.register(cors, {
   origin: true,
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -14,7 +13,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Add a JSON body parser
 fastify.register(require('@fastify/formbody'));
 
 fastify.post('/analyze-code', async (req, reply) => {
@@ -57,13 +55,10 @@ fastify.post('/analyze-code', async (req, reply) => {
       max_tokens: 1000
     });
 
-    // Log the full response for debugging
     console.log('OpenAI Response:', response.choices[0].message.content);
 
-    // Parse the JSON response
     const analysisResult = JSON.parse(response.choices[0].message.content);
 
-    // Send the comprehensive analysis
     reply.send({
       naturalLanguageExplanation: analysisResult.naturalLanguageExplanation || 'No explanation available',
       refactoredCode: analysisResult.refactoredCode || 'No refactored code available',
@@ -72,7 +67,6 @@ fastify.post('/analyze-code', async (req, reply) => {
   } catch (error) {
     console.error('Analysis error:', error);
     
-    // More detailed error logging
     if (error.response) {
       console.error('OpenAI Error Response:', error.response.data);
     }
@@ -84,7 +78,6 @@ fastify.post('/analyze-code', async (req, reply) => {
   }
 });
 
-// Inicia o servidor
 const start = async () => {
   try {
     await fastify.listen({ port: 3001, host: '0.0.0.0' });
