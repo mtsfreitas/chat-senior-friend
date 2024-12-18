@@ -2,6 +2,28 @@ import { useState } from 'react';
 import { TextField, Button, CircularProgress, Typography, Box, Paper } from '@mui/material';
 import axios from 'axios';
 
+// Function to format text with proper line breaks for numbered lists
+const formatText = (text) => {
+  // Split the text into lines
+  const lines = text.split('\n');
+  
+  return lines.map((line, index) => {
+    // Check if the line starts with a number followed by a period
+    const numberListMatch = line.match(/^(\d+\.\s*)(.+)$/);
+    
+    if (numberListMatch) {
+      return (
+        <Box key={index} sx={{ pl: 2, textIndent: '-1.5em', mb: 1 }}>
+          <Typography>{line}</Typography>
+        </Box>
+      );
+    }
+    
+    // Return regular text as is
+    return <Typography key={index}>{line}</Typography>;
+  });
+};
+
 export default function Home() {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -57,7 +79,7 @@ export default function Home() {
         <Box>
           <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
             <Typography variant="h6" gutterBottom>Natural Language Explanation</Typography>
-            <Typography>{result.naturalLanguageExplanation}</Typography>
+            {formatText(result.naturalLanguageExplanation)}
           </Paper>
 
           <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
@@ -84,7 +106,7 @@ export default function Home() {
 
           <Paper elevation={3} sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>Step-by-Step Reasoning</Typography>
-            <Typography>{result.stepByStepReasoning}</Typography>
+            {formatText(result.stepByStepReasoning)}
           </Paper>
         </Box>
       )}
