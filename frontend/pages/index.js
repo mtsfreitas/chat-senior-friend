@@ -1,6 +1,21 @@
 import { useState } from 'react';
 import { TextField, Button, CircularProgress, Typography, Box, Paper } from '@mui/material';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dracula } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import axios from 'axios';
+
+// Function to detect programming language
+const detectLanguage = (code) => {
+  // Common language detection heuristics
+  if (code.includes('import ') && code.includes('from ')) return 'javascript';
+  if (code.includes('def ') || code.includes('class ')) return 'python';
+  if (code.includes('public class ') || code.includes('System.out.println')) return 'java';
+  if (code.includes('#include ') || code.includes('using namespace')) return 'cpp';
+  if (code.includes('function ') || code.includes('<?php')) return 'php';
+  if (code.includes('console.log')) return 'javascript';
+  if (code.includes('const ') || code.includes('let ')) return 'typescript';
+  return 'plaintext'; // default fallback
+};
 
 // Function to format text with proper line breaks for numbered lists
 const formatText = (text) => {
@@ -84,24 +99,19 @@ export default function Home() {
 
           <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
             <Typography variant="h6" gutterBottom>Refactored Code</Typography>
-            <Box 
-              component="pre" 
-              sx={{ 
-                bgcolor: '#f4f4f4', 
-                p: 2, 
-                borderRadius: 1, 
-                overflowX: 'auto',
-                whiteSpace: 'pre-wrap',
-                wordWrap: 'break-word',
-                fontFamily: 'monospace',
-                fontSize: '0.875rem',
-                border: '1px solid #ddd',
-                maxHeight: '400px',
-                overflowY: 'auto'
+            <SyntaxHighlighter 
+              language={detectLanguage(result.refactoredCode)}
+              style={dracula}
+              customStyle={{ 
+                borderRadius: '4px',
+                maxHeight: '500px',
+                overflowY: 'auto',
+                fontSize: '0.875rem'
               }}
+              showLineNumbers
             >
               {result.refactoredCode}
-            </Box>
+            </SyntaxHighlighter>
           </Paper>
 
           <Paper elevation={3} sx={{ p: 3 }}>
