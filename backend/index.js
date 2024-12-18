@@ -5,7 +5,7 @@ const OpenAI = require('openai');
 
 // Configure CORS
 fastify.register(cors, {
-  origin: true, // This allows all origins, you can restrict this in production
+  origin: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 });
@@ -28,17 +28,54 @@ fastify.post('/analyze-code', async (req, reply) => {
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'You are a helpful assistant for analyzing and improving code.' },
-        { role: 'user', content: `Analyze and refactor this code:\n${code}` },
+        { 
+          role: 'system', 
+          content: `You are an expert code analyst. For any code provided, generate a comprehensive analysis. 
+          Provide clear, detailed responses for:
+          1. Natural Language Explanation: A comprehensive description of what the code does
+          2. Refactored Code: An improved version of the code with comments explaining the improvements
+          3. Step-by-Step Reasoning: Detailed explanation of how you analyzed the code
+
+          Format your response as a JSON object with these three keys:
+          - naturalLanguageExplanation: string
+          - refactoredCode: string
+          - stepByStepReasoning: string
+
+          IMPORTANT: Ensure each section is populated with meaningful content.`
+        },
+        { 
+          role: 'user', 
+          content: `Analyze this code:\n${code}` 
+        }
       ],
+      response_format: { type: "json_object" },
+      max_tokens: 1000
     });
 
-    const explanation = response.choices[0].message.content;
+    // Log the full response for debugging
+    console.log('OpenAI Response:', response.choices[0].message.content);
 
-    reply.send({ explanation });
+    // Parse the JSON response
+    const analysisResult = JSON.parse(response.choices[0].message.content);
+
+    // Send the comprehensive analysis
+    reply.send({
+      naturalLanguageExplanation: analysisResult.naturalLanguageExplanation || 'No explanation available',
+      refactoredCode: analysisResult.refactoredCode || 'No refactored code available',
+      stepByStepReasoning: analysisResult.stepByStepReasoning || 'No reasoning available'
+    });
   } catch (error) {
-    console.error(error);
-    reply.code(500).send({ error: 'Failed to process request' });
+    console.error('Analysis error:', error);
+    
+    // More detailed error logging
+    if (error.response) {
+      console.error('OpenAI Error Response:', error.response.data);
+    }
+    
+    reply.code(500).send({ 
+      error: 'Failed to process request', 
+      details: error.message 
+    });
   }
 });
 
