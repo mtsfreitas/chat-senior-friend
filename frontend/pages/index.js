@@ -18,27 +18,17 @@ const detectLanguage = (code) => {
 
 // Function to format text with proper line breaks for numbered lists
 const formatText = (text) => {
-  // Adicionando uma quebra de linha após o padrão ponto + espaço + número + ponto, mas mantendo o primeiro item juntos
-  const lines = text.split(/(?<=\.\s)(?=\d+\.)/).filter(line => line.trim().length > 0);
-
+  const lines = text.split('\n');
   return lines.map((line, index) => {
-    // Identifica as linhas que começam com o padrão "número ponto" após a quebra
-    const numberListMatch = line.match(/^(\d+\.\s)(.*)$/);
+    const numberListMatch = line.match(/^(\d+\.\s*)(.+)$/);
     if (numberListMatch) {
       return (
         <Box key={index} sx={{ pl: 2, textIndent: '-1.5em', mb: 1 }}>
-          <Typography>
-            <span style={{ fontWeight: 'bold' }}>{numberListMatch[1]}</span>
-            {numberListMatch[2]}
-          </Typography>
+          <Typography>{line}</Typography>
         </Box>
       );
     }
-    return (
-      <Typography key={index} sx={{ pl: 2 }}>
-        {line}
-      </Typography>
-    );
+    return <Typography key={index}>{line}</Typography>;
   });
 };
 
@@ -53,7 +43,7 @@ export default function Home() {
   const handleCodeChange = (e) => {
     setCode(e.target.value);
   };
-  
+
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
@@ -82,97 +72,90 @@ export default function Home() {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', bgcolor: '#f5f5f5', p: 2 }}>
       <Box sx={{ maxWidth: '800px', width: '100%' }}>
-      <Typography 
-  variant="h4" 
-  mb={2} 
-  align="center" 
-  sx={{ 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center',
-    fontFamily: 'Consolas, monospace',  // Fonte Consolas
-    fontWeight: 'bold'  // Caso queira um peso de fonte mais forte
-  }}
->
-  <img src="code-logo.svg" alt="Code Icon" style={{ width: '45px', height: '45px', marginRight: '15px' }} />
-  Senior Friend
-</Typography>
+        <Typography 
+          variant="h4" 
+          mb={2} 
+          align="center" 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            fontFamily: 'Consolas, monospace',  // Fonte Consolas
+            fontWeight: 'bold'  // Caso queira um peso de fonte mais forte
+          }}
+        >
+          <img src="code-logo.svg" alt="Code Icon" style={{ width: '45px', height: '45px', marginRight: '15px' }} />
+          Senior Friend
+        </Typography>
 
-
-
-        
         <Box sx={{ position: 'relative' }}>
-        <TextField
-          fullWidth
-          multiline
-          variant="outlined"
-          placeholder="Paste your code here..."
-          value={code}
-          onChange={handleCodeChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault(); // Previne a ação padrão de adicionar uma nova linha
-              handleSubmit(); // Chama a função para enviar o código
-            }
-          }}
-          sx={{
-            mb: 2,
-            bgcolor: 'rgb(244, 244, 244)',
-            borderRadius: '8px',
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '15px',
-              padding: '25px',
-              fontSize: '16px',
-              resize: 'none',
-              outline: 'none',
-              fontFamily: 'inherit',
-              '& fieldset': {
-                borderColor: '#848484', // Define a cor da borda para verde
-              },
-              '&:hover fieldset': {
-                borderColor: '#848484', // Borda verde quando passa o mouse sobre o campo
-              },
-              '&.Mui-focused fieldset': {
-                borderColor: '#848484', // Borda verde quando o campo está em foco
-              },
-            },
-          }}
-        />
-
-
-
-          {code && (
-            <Button
-            variant="contained"
-            color="default"
-            onClick={handleSubmit}
-            disabled={loading}
+          <TextField
+            fullWidth
+            multiline
+            variant="outlined"
+            placeholder="Paste your code here..."
+            value={code}
+            onChange={handleCodeChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Previne a ação padrão de adicionar uma nova linha
+                handleSubmit(); // Chama a função para enviar o código
+              }
+            }}
             sx={{
-              position: 'absolute',
-              right: '10px',
-              bottom: '-30px',
-              minWidth: '40px',
-              minHeight: '40px',
-              borderRadius: '50%',
-              padding: 0,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: 'white',
-              color: 'primary.main',
-              border: '1px solid #ccc',
-              '&:hover': {
-                backgroundColor: '#333333',
-                '& img': {
-                  filter: 'invert(100%) sepia(0%) saturate(0%)'
+              mb: 2,
+              bgcolor: 'rgb(244, 244, 244)',
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '15px',
+                padding: '25px',
+                fontSize: '16px',
+                resize: 'none',
+                outline: 'none',
+                fontFamily: 'inherit',
+                '& fieldset': {
+                  borderColor: '#848484', // Define a cor da borda para verde
+                },
+                '&:hover fieldset': {
+                  borderColor: '#848484', // Borda verde quando passa o mouse sobre o campo
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#848484', // Borda verde quando o campo está em foco
                 },
               },
             }}
-          >
-            {loading ? <CircularProgress size={24} /> : <img src="/wizard.svg" alt="Send" style={{ width: '20px', height: '20px' }} />}
-          </Button>
-          
-          
+          />
+
+          {code && (
+            <Button
+              variant="contained"
+              color="default"
+              onClick={handleSubmit}
+              disabled={loading}
+              sx={{
+                position: 'absolute',
+                right: '10px',
+                bottom: '-30px',
+                minWidth: '40px',
+                minHeight: '40px',
+                borderRadius: '50%',
+                padding: 0,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: 'white',
+                color: 'primary.main',
+                border: '1px solid #ccc',
+                '&:hover': {
+                  backgroundColor: '#333333',
+                  '& img': {
+                    filter: 'invert(100%) sepia(0%) saturate(0%)'
+                  },
+                },
+              }}
+            >
+              {loading ? <CircularProgress size={24} /> : <img src="/wizard.svg" alt="Send" style={{ width: '20px', height: '20px' }} />}
+            </Button>
           )}
         </Box>
 

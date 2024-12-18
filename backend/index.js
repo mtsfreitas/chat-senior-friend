@@ -41,6 +41,11 @@ fastify.post('/analyze-code', async (req, reply) => {
           - refactoredCode: string
           - stepByStepReasoning: string
 
+          Please ensure the following:
+          - The "Step-by-Step Reasoning" should be formatted as a numbered list with line breaks after each step, like this:
+            1. First, you analyzed the variable declarations...
+            2. Then, you examined the flow of the program...
+
           IMPORTANT: Ensure each section is populated with meaningful content. Do not use Markdown formatting in your responses. Provide plain text only.`
         },
         { 
@@ -89,4 +94,5 @@ const start = async () => {
     process.exit(1);
   }
 };
+
 start();
