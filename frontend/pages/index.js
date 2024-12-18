@@ -18,48 +18,42 @@ const detectLanguage = (code) => {
 
 // Function to format text with proper line breaks for numbered lists
 const formatText = (text) => {
-  const lines = text.split('\n');
+  // Adicionando uma quebra de linha após o padrão ponto + espaço + número + ponto, mas mantendo o primeiro item juntos
+  const lines = text.split(/(?<=\.\s)(?=\d+\.)/).filter(line => line.trim().length > 0);
+
   return lines.map((line, index) => {
-    const numberListMatch = line.match(/^(\d+\.\s*)(.+)$/);
+    // Identifica as linhas que começam com o padrão "número ponto" após a quebra
+    const numberListMatch = line.match(/^(\d+\.\s)(.*)$/);
     if (numberListMatch) {
       return (
         <Box key={index} sx={{ pl: 2, textIndent: '-1.5em', mb: 1 }}>
-          <Typography>{line}</Typography>
+          <Typography>
+            <span style={{ fontWeight: 'bold' }}>{numberListMatch[1]}</span>
+            {numberListMatch[2]}
+          </Typography>
         </Box>
       );
     }
-    return <Typography key={index}>{line}</Typography>;
+    return (
+      <Typography key={index} sx={{ pl: 2 }}>
+        {line}
+      </Typography>
+    );
   });
 };
+
 
 export default function Home() {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [rows, setRows] = useState(2);
   const [copiedCode, setCopiedCode] = useState(false);
 
   const handleCodeChange = (e) => {
-    const newValue = e.target.value;
-    setCode(newValue);
-
-    if (newValue.trim() === '') {
-      setRows(2);
-      return;
-    }
-
-    const textareaLineHeight = 24;
-    const { scrollHeight } = e.target;
-    
-    const currentRows = Math.min(
-      Math.max(Math.ceil(scrollHeight / textareaLineHeight), 2), 
-      6
-    );
-
-    setRows(currentRows);
+    setCode(e.target.value);
   };
-
+  
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
@@ -88,61 +82,97 @@ export default function Home() {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', bgcolor: '#f5f5f5', p: 2 }}>
       <Box sx={{ maxWidth: '800px', width: '100%' }}>
-        <Typography variant="h4" mb={2} align="center">Code Snippet Refactoring Tool</Typography>
+      <Typography 
+  variant="h4" 
+  mb={2} 
+  align="center" 
+  sx={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    fontFamily: 'Consolas, monospace',  // Fonte Consolas
+    fontWeight: 'bold'  // Caso queira um peso de fonte mais forte
+  }}
+>
+  <img src="code-logo.svg" alt="Code Icon" style={{ width: '45px', height: '45px', marginRight: '15px' }} />
+  Senior Friend
+</Typography>
+
+
+
         
         <Box sx={{ position: 'relative' }}>
-          <TextField
-            fullWidth
-            multiline
-            //rows={rows}
-            variant="outlined"
-            placeholder="Paste your code here..."
-            value={code}
-            onChange={handleCodeChange}
-            sx={{ 
-              mb: 2, 
-              bgcolor: 'rgb(244, 244, 244)', 
-              borderRadius: '8px', 
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '15px',
-                padding: '25px',
-                fontSize: '16px',
-                resize: 'none',
-                outline: 'none',
-                fontFamily: 'inherit',
-                boxSizing: 'border-box',
-                overflowY: 'auto',  // Permite rolagem para o texto sem alterar o padding
-              }
-            }}
-          />
+        <TextField
+          fullWidth
+          multiline
+          variant="outlined"
+          placeholder="Paste your code here..."
+          value={code}
+          onChange={handleCodeChange}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault(); // Previne a ação padrão de adicionar uma nova linha
+              handleSubmit(); // Chama a função para enviar o código
+            }
+          }}
+          sx={{
+            mb: 2,
+            bgcolor: 'rgb(244, 244, 244)',
+            borderRadius: '8px',
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '15px',
+              padding: '25px',
+              fontSize: '16px',
+              resize: 'none',
+              outline: 'none',
+              fontFamily: 'inherit',
+              '& fieldset': {
+                borderColor: '#848484', // Define a cor da borda para verde
+              },
+              '&:hover fieldset': {
+                borderColor: '#848484', // Borda verde quando passa o mouse sobre o campo
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#848484', // Borda verde quando o campo está em foco
+              },
+            },
+          }}
+        />
+
+
 
           {code && (
             <Button
-              variant="contained"
-              color="default"
-              onClick={handleSubmit}
-              disabled={loading}
-              sx={{
-                position: 'absolute',
-                right: '10px',
-                bottom: '-30px',
-                minWidth: '40px',
-                minHeight: '40px',
-                borderRadius: '50%',
-                padding: 0,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: 'white',
-                color: 'primary.main',
-                border: '1px solid #ccc',
-                '&:hover': {
-                  backgroundColor: '#f5f5f5',
+            variant="contained"
+            color="default"
+            onClick={handleSubmit}
+            disabled={loading}
+            sx={{
+              position: 'absolute',
+              right: '10px',
+              bottom: '-30px',
+              minWidth: '40px',
+              minHeight: '40px',
+              borderRadius: '50%',
+              padding: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'white',
+              color: 'primary.main',
+              border: '1px solid #ccc',
+              '&:hover': {
+                backgroundColor: '#333333',
+                '& img': {
+                  filter: 'invert(100%) sepia(0%) saturate(0%)'
                 },
-              }}
-            >
-              {loading ? <CircularProgress size={24} /> : <img src="/wizard.svg" alt="Send" style={{ width: '20px', height: '20px' }} />}
-            </Button>
+              },
+            }}
+          >
+            {loading ? <CircularProgress size={24} /> : <img src="/wizard.svg" alt="Send" style={{ width: '20px', height: '20px' }} />}
+          </Button>
+          
+          
           )}
         </Box>
 
@@ -160,14 +190,19 @@ export default function Home() {
         {result && (
           <Box>
             <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
-              <Typography variant="h6" gutterBottom>Natural Language Explanation</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <img src="message-balloon-ai.svg" alt="Explanation Icon" style={{ width: '24px', height: '24px', marginRight: '8px' }} />
+                <Typography variant="h6">Natural Language Explanation</Typography>
+              </Box>
               {formatText(result.naturalLanguageExplanation)}
             </Paper>
 
             <Paper elevation={3} sx={{ p: 3, mb: 2, position: 'relative' }}>
-              <Typography variant="h6" gutterBottom>Refactored Code</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <img src="code-ai.svg" alt="Code Icon" style={{ width: '24px', height: '24px', marginRight: '8px' }} />
+                <Typography variant="h6">Refactored Code</Typography>
+              </Box>
               
-              {/* Botão de copiar no canto superior direito */}
               <IconButton 
                 onClick={handleCopyCode}
                 sx={{
@@ -199,7 +234,10 @@ export default function Home() {
             </Paper>
 
             <Paper elevation={3} sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>Step-by-Step Reasoning</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <img src="brain-ai.svg" alt="Reasoning Icon" style={{ width: '24px', height: '24px', marginRight: '8px' }} />
+                <Typography variant="h6">Step-by-Step Reasoning</Typography>
+              </Box>
               {formatText(result.stepByStepReasoning)}
             </Paper>
           </Box>
