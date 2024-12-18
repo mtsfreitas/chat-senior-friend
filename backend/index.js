@@ -41,7 +41,7 @@ fastify.post('/analyze-code', async (req, reply) => {
           - refactoredCode: string
           - stepByStepReasoning: string
 
-          IMPORTANT: Ensure each section is populated with meaningful content.`
+          IMPORTANT: Ensure each section is populated with meaningful content. Do not use Markdown formatting in your responses. Provide plain text only.`
         },
         { 
           role: 'user', 

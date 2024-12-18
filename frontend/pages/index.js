@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TextField, Button, CircularProgress, Typography, Box, Paper } from '@mui/material';
+import { TextField, Button, CircularProgress, Typography, Box, Paper, IconButton } from '@mui/material';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import axios from 'axios';
@@ -37,6 +37,28 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [rows, setRows] = useState(2);
+  const [copiedCode, setCopiedCode] = useState(false);
+
+  const handleCodeChange = (e) => {
+    const newValue = e.target.value;
+    setCode(newValue);
+
+    if (newValue.trim() === '') {
+      setRows(2);
+      return;
+    }
+
+    const textareaLineHeight = 24;
+    const { scrollHeight } = e.target;
+    
+    const currentRows = Math.min(
+      Math.max(Math.ceil(scrollHeight / textareaLineHeight), 2), 
+      6
+    );
+
+    setRows(currentRows);
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -54,36 +76,73 @@ export default function Home() {
     }
   };
 
+  const handleCopyCode = () => {
+    if (result && result.refactoredCode) {
+      navigator.clipboard.writeText(result.refactoredCode).then(() => {
+        setCopiedCode(true);
+        setTimeout(() => setCopiedCode(false), 2000);
+      });
+    }
+  };
+
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', bgcolor: '#f5f5f5', p: 2 }}>
       <Box sx={{ maxWidth: '800px', width: '100%' }}>
         <Typography variant="h4" mb={2} align="center">Code Snippet Refactoring Tool</Typography>
-        <TextField
-          fullWidth
-          multiline
-          rows={6}
-          variant="outlined"
-          placeholder="Paste your code here..."
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          sx={{ 
-            mb: 2, 
-            bgcolor: 'rgb(244, 244, 244)', 
-            borderRadius: '8px', 
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '8px',
-            }
-          }}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSubmit}
-          disabled={!code || loading}
-          sx={{ mb: 2, display: 'block', margin: '0 auto' }}
-        >
-          {loading ? <CircularProgress size={24} /> : 'Analyze Code'}
-        </Button>
+        
+        <Box sx={{ position: 'relative' }}>
+          <TextField
+            fullWidth
+            multiline
+            rows={rows}
+            variant="outlined"
+            placeholder="Paste your code here..."
+            value={code}
+            onChange={handleCodeChange}
+            sx={{ 
+              mb: 2, 
+              bgcolor: 'rgb(244, 244, 244)', 
+              borderRadius: '8px', 
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+              }
+            }}
+          />
+
+          {code && (
+            <Button
+              variant="contained"
+              color="default"
+              onClick={handleSubmit}
+              disabled={loading}
+              sx={{
+                position: 'absolute',
+                right: '10px',
+                bottom: '-30px',
+                minWidth: '40px',
+                minHeight: '40px',
+                borderRadius: '50%',
+                padding: 0,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: 'white',
+                color: 'primary.main',
+                border: '1px solid #ccc',
+                '&:hover': {
+                  backgroundColor: '#f5f5f5',
+                },
+              }}
+            >
+              {loading ? <CircularProgress size={24} /> : <img src="/send.svg" alt="Send" style={{ width: '20px', height: '20px' }} />}
+            </Button>
+          )}
+        </Box>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <img src="ai.svg" alt="AI Icon" style={{ width: '20px', height: '20px', marginRight: '8px' }} />
+          <Typography variant="body2" color="textSecondary">model: 'gpt-4o-mini'</Typography>
+        </Box>
 
         {error && (
           <Typography color="error" mb={2} align="center">
@@ -98,8 +157,25 @@ export default function Home() {
               {formatText(result.naturalLanguageExplanation)}
             </Paper>
 
-            <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+            <Paper elevation={3} sx={{ p: 3, mb: 2, position: 'relative' }}>
               <Typography variant="h6" gutterBottom>Refactored Code</Typography>
+              
+              {/* Botão de copiar no canto superior direito */}
+              <IconButton 
+                onClick={handleCopyCode}
+                sx={{
+                  position: 'absolute', 
+                  top: 10, 
+                  right: 10,
+                  color: copiedCode ? 'green' : 'gray'
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor">
+                  <path d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+              </IconButton>
+
               <SyntaxHighlighter 
                 language={detectLanguage(result.refactoredCode)}
                 style={dracula}
