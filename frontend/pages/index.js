@@ -6,7 +6,6 @@ import axios from 'axios';
 
 // Function to detect programming language
 const detectLanguage = (code) => {
-  // Common language detection heuristics
   if (code.includes('import ') && code.includes('from ')) return 'javascript';
   if (code.includes('def ') || code.includes('class ')) return 'python';
   if (code.includes('public class ') || code.includes('System.out.println')) return 'java';
@@ -14,18 +13,14 @@ const detectLanguage = (code) => {
   if (code.includes('function ') || code.includes('<?php')) return 'php';
   if (code.includes('console.log')) return 'javascript';
   if (code.includes('const ') || code.includes('let ')) return 'typescript';
-  return 'plaintext'; // default fallback
+  return 'plaintext';
 };
 
 // Function to format text with proper line breaks for numbered lists
 const formatText = (text) => {
-  // Split the text into lines
   const lines = text.split('\n');
-  
   return lines.map((line, index) => {
-    // Check if the line starts with a number followed by a period
     const numberListMatch = line.match(/^(\d+\.\s*)(.+)$/);
-    
     if (numberListMatch) {
       return (
         <Box key={index} sx={{ pl: 2, textIndent: '-1.5em', mb: 1 }}>
@@ -33,8 +28,6 @@ const formatText = (text) => {
         </Box>
       );
     }
-    
-    // Return regular text as is
     return <Typography key={index}>{line}</Typography>;
   });
 };
@@ -62,64 +55,73 @@ export default function Home() {
   };
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Typography variant="h4" mb={2}>Code Snippet Refactoring Tool</Typography>
-      <TextField
-        fullWidth
-        multiline
-        rows={6}
-        variant="outlined"
-        placeholder="Paste your code here..."
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-        sx={{ mb: 2 }}
-      />
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSubmit}
-        disabled={!code || loading}
-        sx={{ mb: 2 }}
-      >
-        {loading ? <CircularProgress size={24} /> : 'Analyze Code'}
-      </Button>
-      
-      {error && (
-        <Typography color="error" mb={2}>
-          {error}
-        </Typography>
-      )}
-      
-      {result && (
-        <Box>
-          <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
-            <Typography variant="h6" gutterBottom>Natural Language Explanation</Typography>
-            {formatText(result.naturalLanguageExplanation)}
-          </Paper>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', bgcolor: '#f5f5f5', p: 2 }}>
+      <Box sx={{ maxWidth: '800px', width: '100%' }}>
+        <Typography variant="h4" mb={2} align="center">Code Snippet Refactoring Tool</Typography>
+        <TextField
+          fullWidth
+          multiline
+          rows={6}
+          variant="outlined"
+          placeholder="Paste your code here..."
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          sx={{ 
+            mb: 2, 
+            bgcolor: 'rgb(244, 244, 244)', 
+            borderRadius: '8px', 
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '8px',
+            }
+          }}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSubmit}
+          disabled={!code || loading}
+          sx={{ mb: 2, display: 'block', margin: '0 auto' }}
+        >
+          {loading ? <CircularProgress size={24} /> : 'Analyze Code'}
+        </Button>
 
-          <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
-            <Typography variant="h6" gutterBottom>Refactored Code</Typography>
-            <SyntaxHighlighter 
-              language={detectLanguage(result.refactoredCode)}
-              style={dracula}
-              customStyle={{ 
-                borderRadius: '4px',
-                maxHeight: '500px',
-                overflowY: 'auto',
-                fontSize: '0.875rem'
-              }}
-              showLineNumbers
-            >
-              {result.refactoredCode}
-            </SyntaxHighlighter>
-          </Paper>
+        {error && (
+          <Typography color="error" mb={2} align="center">
+            {error}
+          </Typography>
+        )}
 
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>Step-by-Step Reasoning</Typography>
-            {formatText(result.stepByStepReasoning)}
-          </Paper>
-        </Box>
-      )}
+        {result && (
+          <Box>
+            <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+              <Typography variant="h6" gutterBottom>Natural Language Explanation</Typography>
+              {formatText(result.naturalLanguageExplanation)}
+            </Paper>
+
+            <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+              <Typography variant="h6" gutterBottom>Refactored Code</Typography>
+              <SyntaxHighlighter 
+                language={detectLanguage(result.refactoredCode)}
+                style={dracula}
+                customStyle={{ 
+                  borderRadius: '4px',
+                  maxHeight: '500px',
+                  overflowY: 'auto',
+                  fontSize: '0.875rem'
+                }}
+                showLineNumbers
+              >
+                {result.refactoredCode}
+              </SyntaxHighlighter>
+            </Paper>
+
+            <Paper elevation={3} sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>Step-by-Step Reasoning</Typography>
+              {formatText(result.stepByStepReasoning)}
+            </Paper>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 }
