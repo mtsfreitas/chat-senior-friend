@@ -1,23 +1,22 @@
 const fastify = require('fastify');
 const nock = require('nock');
-const routes = require('../../routes/analyzer.routes'); // Corrigido
+const routes = require('../../routes/analyzer.routes'); 
 
 describe('Routes', () => {
   let app;
 
   beforeAll(async () => {
     app = fastify();
-    app.register(routes);  // Registra as rotas no app Fastify
+    app.register(routes); 
   });
 
   afterAll(async () => {
-    await app.close();  // Fecha o servidor Fastify após os testes
+    await app.close(); 
   });
 
   it('should return 200 when valid code is sent', async () => {
     const code = 'console.log("Hello, World!");';
 
-    // Simula a resposta da API da OpenAI
     nock('https://api.openai.com')
       .post('/v1/chat/completions')
       .reply(200, {
