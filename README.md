@@ -1,4 +1,4 @@
-# Senior Friend
+# Senior Friend by: Matheus Freitas Martins
 ![alt text](prints/image-4.png)
 
 # Instructions
