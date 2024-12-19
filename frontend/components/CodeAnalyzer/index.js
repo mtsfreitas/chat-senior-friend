@@ -18,7 +18,18 @@ export default function CodeAnalyzer() {
       setResult(response.data);
     } catch (err) {
       console.error('Full Error:', err);
-      setError('Failed to analyze the code. Please try again.');
+
+      // Tratar diferentes tipos de erro
+      if (!err.response) {
+        // Caso não tenha resposta, pode ser erro de rede ou servidor inacessível
+        setError('Serviço indisponível no momento. Tente novamente mais tarde.');
+      } else if (err.response.status === 500) {
+        // Caso de erro interno do servidor
+        setError('Erro no servidor. Tente novamente mais tarde.');
+      } else {
+        // Erros mais genéricos
+        setError('Falha ao analisar o código. Tente novamente.');
+      }
     }
   };
 
